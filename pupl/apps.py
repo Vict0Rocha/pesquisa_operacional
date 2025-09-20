@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class AssinaturaConfig(AppConfig):
+class PuplConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'assinatura'
+    name = 'pupl'
