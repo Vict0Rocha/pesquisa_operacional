@@ -1,12 +1,207 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* --- Estilos Gerais --- */
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #10b981;
+    --background-color: #f3f4f6;
+    --panel-background: #ffffff;
+    --text-color: #374151;
+    --light-text-color: #6b7280;
+    --border-color: #d1d5db;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
-.content {
-    width: 1200px;
-    height: 100vh;
-    background-color: #f1f1f1;
-    color: rgb(43, 43, 43);
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    padding: 2rem;
+}
+
+/* --- Estrutura Principal --- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.panel {
+    background-color: var(--panel-background);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.panel h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+/* --- Formulário de Definição do Problema --- */
+.problem-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.problem-form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.problem-form input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.objective-group {
+    display: flex;
+    gap: 1rem;
+}
+
+/* --- Botões --- */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background-color: #4338ca;
+}
+
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background-color: #d1d5db;
+}
+
+.btn-remove {
+    background-color: #fee2e2;
+    color: #ef4444;
+    padding: 0.5rem 1rem;
+}
+
+.btn-remove:hover {
+    background-color: #fecaca;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* --- Seções Dinâmicas (Variáveis, Restrições) --- */
+.dynamic-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    background-color: #f9fafb;
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+.dynamic-row input,
+.dynamic-row select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+/* --- Painel de Resultados --- */
+/* .results-panel .result-status {
+    background-color: var(--secondary-color);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.results-panel .result-objective {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.results-panel .result-objective p {
+    font-size: 1.1rem;
+    color: var(--light-text-color);
+}
+
+.results-panel .result-objective h3 {
+    font-size: 2.25rem;
+    color: var(--secondary-color);
+}
+
+.results-panel table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+.results-panel th,
+.results-panel td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.results-panel th {
+    background-color: #f9fafb;
+}
+
+.results-panel .code-summary {
+    background-color: #1f2937;
+    color: #d1d5db;
+    padding: 1rem;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    font-family: 'Courier New', Courier, monospace;
+} */
