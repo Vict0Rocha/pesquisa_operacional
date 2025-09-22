@@ -14,10 +14,10 @@
 
 - O Problema: Como Tomar a Melhor Decisão? [aqui](#o-problema-como-tomar-a-melhor-decisão)
 - A Solução: Programação Linear. [aqui](#a-solução-programação-linear)
-- [Nosso Site: A Ferramenta que Simplifica Tudo](#a-ferramenta-que-simplifica-tudo)
-- [Como Usar o PuLP Solver](#como-usar-o-pulp-solver)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Como Executar o Projeto Localmente](#como-executar-o-projeto-localmente)
+- Nosso Site: A Ferramenta que Simplifica Tudo. [aqui](#a-ferramenta-que-simplifica-tudo)
+- Como Usar o PuLP Solver. [aqui](#como-usar-o-pulp-solver)
+- Tecnologias Utilizadas. [aqui](#tecnologias-utilizadas)
+- Como Executar o Projeto Localmente. [aqui](#como-executar-o-projeto-localmente)
 
 ---
 
@@ -136,3 +136,5 @@ Acesse `http://127.0.0.1:8000/` no seu navegador e comece a otimizar!
 ---
 
 *Este projeto foi desenvolvido na disciplina de Pesquisa Operacinal, apenas para com o intuito de criar uma boa visilização na resolução de problemas com programação linear.*
+
+Projeto gerador por [gemini](https://gemini.google.com/app)
