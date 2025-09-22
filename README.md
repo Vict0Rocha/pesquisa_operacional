@@ -135,6 +135,6 @@ Acesse `http://127.0.0.1:8000/` no seu navegador e comece a otimizar!
 
 ---
 
-*Este projeto foi desenvolvido na disciplina de Pesquisa Operacinal, apenas para com o intuito de criar uma boa visilização na resolução de problemas com programação linear.*
+*Este projeto foi desenvolvido na disciplina de Pesquisa Operacinal, apenas com o intuito de criar uma boa visilização na resolução de problemas com programação linear.*
 
 Projeto gerador por [gemini](https://gemini.google.com/app)
