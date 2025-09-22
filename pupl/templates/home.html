@@ -1,0 +1,214 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PuLP Solver</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Estilo para melhor visualização dos nomes das variáveis */
+        .variable-label {
+            font-weight: 600;
+            margin: 0 0.25rem;
+            min-width: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header><h1>PuLP Solver</h1></header>
+        <main class="main-content">
+            <section class="panel problem-definition">
+                <h2>1. Defina o seu problema</h2>
+
+                <form class="problem-form" method="POST" action="{% url 'home' %}">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="problem-name">Nome do Problema</label>
+                        <input type="text" id="problem-name" name="problem_name" placeholder="Ex: Planejamento de Projetos" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Objetivo</label>
+                        <div class="objective-group">
+                            <label><input type="radio" name="objective_type" value="max" checked> Maximizar</label>
+                            <label><input type="radio" name="objective_type" value="min"> Minimizar</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Variáveis de Decisão</label>
+                        <div class="action-buttons">
+                            <button type="button" id="add-variable-btn" class="btn btn-secondary">+ Adicionar Variável</button>
+                        </div>
+                        <div id="variables-container">
+                            </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Função Objetivo</label>
+                        <div id="objective-function-container">
+                            </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Restrições</label>
+                        <div class="action-buttons">
+                            <button type="button" id="add-constraint-btn" class="btn btn-secondary">+ Adicionar Restrição</button>
+                        </div>
+                        <div id="constraints-container">
+                            </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Resolver Problema</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Seleciona os botões e containers
+            const addVariableBtn = document.getElementById('add-variable-btn');
+            const addConstraintBtn = document.getElementById('add-constraint-btn');
+            const variablesContainer = document.getElementById('variables-container');
+            const objectiveContainer = document.getElementById('objective-function-container');
+            const constraintsContainer = document.getElementById('constraints-container');
+
+            let variableCount = 0;
+            let constraintCount = 0;
+            let variables = [];
+
+            // --- FUNÇÃO PRINCIPAL: ADICIONAR VARIÁVEL ---
+            addVariableBtn.addEventListener('click', function () {
+                variableCount++;
+                const variableId = variableCount;
+
+                // Cria o HTML para a nova variável
+                const newVariableRow = document.createElement('div');
+                newVariableRow.classList.add('dynamic-row');
+                newVariableRow.setAttribute('data-variable-id', variableId);
+                newVariableRow.innerHTML = `
+                    <input type="text" name="var_name_${variableId}" placeholder="Nome (ex: W)" required>
+                    <select name="var_type_${variableId}">
+                        <option value="Continuous">Contínua</option>
+                        <option value="Integer">Inteira</option>
+                    </select>
+                    <button type="button" class="btn btn-remove remove-variable-btn">Remover</button>
+                `;
+                variablesContainer.appendChild(newVariableRow);
+                updateStateAndUI();
+            });
+
+            // --- FUNÇÃO PRINCIPAL: ADICIONAR RESTRIÇÃO ---
+            addConstraintBtn.addEventListener('click', function () {
+                if (variables.length === 0) {
+                    alert('Por favor, adicione pelo menos uma variável antes de adicionar uma restrição.');
+                    return;
+                }
+                constraintCount++;
+                const constraintId = constraintCount;
+
+                // Cria a base da linha de restrição
+                const newConstraintRow = document.createElement('div');
+                newConstraintRow.classList.add('dynamic-row');
+                newConstraintRow.setAttribute('data-constraint-id', constraintId);
+                
+                // Monta os inputs de coeficientes baseados nas variáveis atuais
+                let coefficientsHtml = '';
+                variables.forEach((variable, index) => {
+                    coefficientsHtml += `
+                        <input type="number" name="const_${constraintId}_coef_${variable.name}" value="0" step="any" required> 
+                        <span class="variable-label">* ${variable.name}</span>
+                        ${index < variables.length - 1 ? '+' : ''}
+                    `;
+                });
+                
+                // Monta o restante da linha (operador, valor, botão)
+                newConstraintRow.innerHTML = `
+                    <div style="display: flex; align-items: center; flex-wrap: wrap;">${coefficientsHtml}</div>
+                    <select name="const_${constraintId}_op">
+                        <option value="<=">&le;</option>
+                        <option value=">=">&ge;</option>
+                        <option value="==">=</option>
+                    </select>
+                    <input type="number" name="const_${constraintId}_rhs" value="0" step="any" required>
+                    <button type="button" class="btn btn-remove remove-constraint-btn">Remover</button>
+                `;
+                constraintsContainer.appendChild(newConstraintRow);
+            });
+
+
+            // --- LÓGICA DE REMOÇÃO (USANDO EVENT DELEGATION) ---
+            document.body.addEventListener('click', function (event) {
+                if (event.target.classList.contains('remove-variable-btn')) {
+                    event.target.closest('.dynamic-row').remove();
+                    updateStateAndUI();
+                }
+                if (event.target.classList.contains('remove-constraint-btn')) {
+                    event.target.closest('.dynamic-row').remove();
+                }
+            });
+
+            // --- FUNÇÕES DE ATUALIZAÇÃO DA INTERFACE ---
+            function updateStateAndUI() {
+                // Lê todas as variáveis da tela e guarda seus nomes
+                variables = [];
+                const variableRows = variablesContainer.querySelectorAll('.dynamic-row');
+                variableRows.forEach(row => {
+                    const input = row.querySelector('input[type="text"]');
+                    if (input.value.trim()) {
+                        variables.push({
+                            id: row.getAttribute('data-variable-id'),
+                            name: input.value.trim()
+                        });
+                    }
+                });
+                updateObjectiveFunctionUI();
+                updateAllConstraintsUI();
+            }
+
+            function updateObjectiveFunctionUI() {
+                objectiveContainer.innerHTML = ''; // Limpa antes de redesenhar
+                if (variables.length > 0) {
+                    const objectiveRow = document.createElement('div');
+                    objectiveRow.classList.add('dynamic-row');
+                    let objectiveHtml = '<span>F.O. =</span>';
+                    variables.forEach((variable, index) => {
+                        objectiveHtml += `
+                            <input type="number" name="obj_coef_${variable.name}" value="0" step="any" required>
+                            <span class="variable-label">* ${variable.name}</span>
+                            ${index < variables.length - 1 ? '+' : ''}
+                        `;
+                    });
+                    objectiveRow.innerHTML = objectiveHtml;
+                    objectiveContainer.appendChild(objectiveRow);
+                }
+            }
+            
+            function updateAllConstraintsUI() {
+                // Atualiza cada linha de restrição já existente para refletir as variáveis atuais
+                const constraintRows = constraintsContainer.querySelectorAll('.dynamic-row');
+                constraintRows.forEach(row => {
+                    const constraintId = row.getAttribute('data-constraint-id');
+                    let coefficientsHtml = '';
+                    variables.forEach((variable, index) => {
+                        // Tenta preservar o valor que já estava digitado
+                        const existingInput = row.querySelector(`input[name="const_${constraintId}_coef_${variable.name}"]`);
+                        const existingValue = existingInput ? existingInput.value : 0;
+                        coefficientsHtml += `
+                            <input type="number" name="const_${constraintId}_coef_${variable.name}" value="${existingValue}" step="any" required>
+                            <span class="variable-label">* ${variable.name}</span>
+                            ${index < variables.length - 1 ? '+' : ''}
+                        `;
+                    });
+                    row.querySelector('div').innerHTML = coefficientsHtml;
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

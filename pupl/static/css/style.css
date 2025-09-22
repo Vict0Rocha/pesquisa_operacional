@@ -25,7 +25,7 @@ body {
 
 /* --- Estrutura Principal --- */
 .container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
@@ -99,7 +99,7 @@ header h1 {
 .btn-primary {
     background-color: var(--primary-color);
     color: white;
-    width: 100%;
+    /* width: 100%; */
 }
 
 .btn-primary:hover {

@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados da Otimização</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: flex-start; }
+        .full-width { grid-column: 1 / -1; }
+        @media (max-width: 900px) { .results-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Resultados da Otimização</h1>
+            {% if results.problem_name %}<p style="color: #6b7280;">Problema: {{ results.problem_name }}</p>{% endif %}
+        </header>
+
+        <main class="main-content" style="display: block;">
+            {% if error %}
+                <div class="panel">
+                    <div class="result-status" style="background-color: #ef4444;">Erro: {{ error }}</div>
+                </div>
+            {% elif results %}
+                <div class="results-grid">
+
+                    <div class="panel full-width">
+                        <div class="result-status" style="background-color: {% if results.status == 'Optimal' %}#10b981{% elif results.status == 'Infeasible' %}#f59e0b{% else %}#6b7280{% endif %};">
+                            Status da Solução: {{ results.status }}
+                        </div>
+                        
+                        {% if results.status == 'Optimal' %}
+                            <div class="result-objective">
+                                <p>Valor Ótimo da Função Objetivo</p>
+                                <h3>{{ results.objective_value|floatformat:2 }}</h3>
+                            </div>
+                        {% else %}
+                            <div class="result-objective" style="background-color: #f9fafb;">
+                                <p>
+                                    {% if results.status == 'Infeasible' %}
+                                        Não foi possível encontrar uma solução que satisfaça todas as restrições. Verifique se há conflitos entre elas (ex: x > 10 e x < 5).
+                                    {% elif results.status == 'Unbounded' %}
+                                        A função objetivo pode crescer (ou diminuir) infinitamente. Verifique se falta alguma restrição para limitar a solução.
+                                    {% else %}
+                                        A solução não foi encontrada. Status: {{ results.status }}.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if results.status == 'Optimal' %}
+                        <div class="panel">
+                            <h2>Plano de Ação</h2>
+                            <p style="margin-top:-1rem; margin-bottom: 1rem; color: #6b7280;">Valores ótimos para as variáveis de decisão.</p>
+                            <table>
+                                <thead><tr><th>Variável</th><th>Valor Ótimo</th></tr></thead>
+                                <tbody>
+                                    {% for var in results.variables %}
+                                        <tr><td>{{ var.name }}</td><td>{{ var.value|floatformat:4 }}</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="panel">
+                            <h2>Visualização Gráfica</h2>
+                            {% if results.plot_url %}
+                                <img src="data:image/png;base64,{{ results.plot_url }}" alt="Gráfico da Solução" style="max-width: 100%; border-radius: 8px;">
+                            {% else %}
+                                <p style="margin-top:-1rem; color: #6b7280;">A visualização gráfica só está disponível para problemas com exatamente 2 variáveis.</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="panel full-width">
+                            <h2>Análise de Recursos (Restrições)</h2>
+                             <p style="margin-top:-1rem; margin-bottom: 1rem; color: #6b7280;">Entenda o impacto de cada restrição na sua solução.</p>
+                            <table>
+                                <thead><tr><th>Restrição</th><th>Folga (Slack)</th><th>Preço Sombra (Shadow Price)</th></tr></thead>
+                                <tbody>
+                                {% for const in results.constraints_analysis %}
+                                    <tr>
+                                        <td>{{ const.name }}</td>
+                                        <td>{{ const.slack|floatformat:4 }}</td>
+                                        <td>{{ const.shadow_price|floatformat:4 }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <div style="font-size: 0.9rem; color: #6b7280; margin-top: 1rem;">
+                                <p><b>Folga:</b> Quanto "sobrou" de um recurso. Se for 0, o recurso foi totalmente utilizado e é um gargalo.</p>
+                                <p><b>Preço Sombra:</b> Quanto o valor da função objetivo melhoraria se você tivesse +1 unidade do recurso daquela restrição. Um valor alto indica um gargalo crítico.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <a href="{% url 'home' %}" class="btn btn-primary" style="text-decoration: none; text-align: center; display: block; margin-top: 2rem;">
+                Resolver Outro Problema
+            </a>
+        </main>
+    </div>
+</body>
+</html>
